@@ -320,7 +320,7 @@ function my_actiondados_callback() {
         $descritivo = '<h4>Informação adicional </h4> <table class="woocommerce-product-attributes shop_attributes">
             <tbody><tr class="woocommerce-product-attributes-item woocommerce-product-attributes-item--attribute_pa_fornecedor">
             <th class="woocommerce-product-attributes-item__label">Fornecedor</th>
-            <td class="woocommerce-product-attributes-item__value"><p>Trend</p>
+            <td class="woocommerce-product-attributes-item__value"><p>'.$response[$i]["fornecedor"].'</p>
 </td>
         </tr>
             <tr class="woocommerce-product-attributes-item woocommerce-product-attributes-item--attribute_pa_acomodacao">
@@ -376,7 +376,7 @@ function my_actiondados_callback() {
  
         wp_set_object_terms($post_id, $tag, 'product_tag');
 
-        Generate_Featured_Image( str_replace("-", "/", $response[$i]["foto"]),   $post_id );
+        Generate_Featured_Image( str_replace("%u;", "/", $response[$i]["foto"]),   $post_id );
              
         update_post_meta( $post_id, '_visibility', 'visible' );
         update_post_meta( $post_id, '_stock_status', 'instock');
@@ -407,6 +407,109 @@ function my_actiondados_callback() {
     die(); // this is required to return a proper result
 
 
+}
+
+add_action('init', 'wp_create_wpforms');
+
+function wp_create_wpforms() {  
+
+    $args = array(
+        'name'        => "motor-de-reservas",
+        'post_type'   => 'wpforms',
+        'post_status' => 'publish',
+        'numberposts' => 1
+    );
+    $my_posts = get_posts($args); 
+
+    if (empty($my_posts[0]->post_title)) {   
+
+        $post = array(
+                'post_title'   => 'Motor de reservas',
+                'post_status'  => 'publish',
+                'post_type'    => 'wpforms',
+                'post_content' => '{"fields":{"1":{"id":"1","type":"text","label":"Destino","description":"","required":"1","size":"medium","placeholder":"","limit_count":"1","limit_mode":"characters","default_value":"","css":"destino","input_mask":""},"2":{"id":"2","type":"text","label":"Check-in - Check-out","description":"","required":"1","size":"medium","placeholder":"","limit_count":"1","limit_mode":"characters","default_value":"","css":"datas","input_mask":""},"3":{"id":"3","type":"number","label":"Adultos","description":"","required":"1","size":"small","placeholder":"","default_value":"2","css":"qtd_adt wpforms-one-third wpforms-first"},"4":{"id":"4","type":"number","label":"Crian\u00e7as","description":"","size":"small","placeholder":"","default_value":"0","css":"qtd_chd wpforms-one-third"},"6":{"id":"6","type":"number","label":"Quartos","description":"","size":"small","placeholder":"","default_value":"1","css":"wpforms-one-third qtd_qts"}},"id":"891","field_id":7,"settings":{"form_title":"Motor de reservas","form_desc":"","form_class":"","submit_text":"Enviar","submit_text_processing":"Enviando...","submit_class":"","antispam":"1","notification_enable":"0","notifications":{"1":{"email":"{admin_email}","subject":"Nova entrada em Motor de reservas","sender_name":"Localhost","sender_address":"{admin_email}","replyto":"","message":"{all_fields}"}},"confirmations":{"1":{"type":"message","message":"","message_scroll":"1","page":"384","redirect":""}}},"meta":{"template":"blank"}}',
+            );
+
+        //Create post
+        $post_id = wp_insert_post( $post, $wp_error );
+    } 
+}
+
+add_action('init', 'wp_create_inputs_motor');
+
+function wp_create_inputs_motor() {   
+
+        $propriedade = $atts['propriedade'];
+
+        $tipo_propriedade = [];
+   
+           $cat_terms = get_terms(
+                   array('tipo_propriedades_integracao'),
+                   array(
+                           'hide_empty'    => false,
+                           'orderby'       => 'name',
+                           'order'         => 'ASC',
+                           'number'        => 50 //specify yours
+                       )
+               );
+   
+   if( $cat_terms ){
+   
+       foreach( $cat_terms as $term ) { 
+   
+           $propriedades[] = array("tipo_propriedade" => $term->slug);
+   
+   }
+   }   
+
+   for ($i=0; $i < count($propriedades); $i++) { 
+       if ($propriedade == $propriedades[$i]["tipo_propriedade"]) { 
+           $tipo_motor = $propriedades[$i]["tipo_propriedade"];
+       }
+   }
+
+        $localizacao = [];
+   
+           $cat_terms = get_terms(
+                   array('localizacao_integracao'),
+                   array(
+                           'hide_empty'    => false,
+                           'orderby'       => 'name',
+                           'order'         => 'ASC',
+                           'number'        => 50 //specify yours
+                       )
+               );
+   
+   if( $cat_terms ){
+   
+       foreach( $cat_terms as $term ) { 
+   
+           $locais[] = array("name_local" => $term->name, "name_hotel" => "", "id" => "", "destination" => "");
+   
+   }
+   }   
+
+   $dados = get_option( 'config_ttbookingintegracao' ); 
+                for ($i=0; $i < 21; $i++) { 
+                  if(!empty($dados['hotel_trend_nh'.$i])){
+                    $hotelaria[] = array("name_local" => "", "name_hotel" => $dados['hotel_trend_nh'.$i], "id" => $dados['id_hotel_trend_nh'.$i], "destination" => $dados['destination_hotel_trend_nh'.$i]);
+                  }
+                }   
+
+                if (empty($locais)) {
+                  $total = $hotelaria;
+                }else if (empty($hotelaria)) {
+                  $total = $locais;
+                }else{
+                  $total = array_merge($locais, $hotelaria); 
+                } 
+
+
+                echo "<input type='hidden' id='destinos_motor' value='".json_encode($total)."'>
+                <input type='hidden' name='destino_pesquisa' id='destino_pesquisa' value=''>
+          <input type='hidden' name='id_hotel' id='id_hotel' value=''>
+          <input type='hidden' name='id_destination_hotel' id='id_destination_hotel' value=''>
+          <input type='hidden' name='destino_hotel' id='destino_hotel' value=''>"; 
 }
 
 session_write_close();

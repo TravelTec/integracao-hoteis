@@ -3,7 +3,7 @@
 var currentMonth = date.getMonth();
 var currentDate = date.getDate();
 var currentYear = date.getFullYear();
-$('#sandbox-container').daterangepicker({
+$('.datas input').daterangepicker({
   startDate: moment(date).add(1,'days'),
   minDate: moment(date).add(1,'days'), 
         locale: {
@@ -41,7 +41,7 @@ $('#sandbox-container').daterangepicker({
     jQuery('#validar_data').val(e.target.value);
     }).on("input focus", function (e) { 
       if (jQuery("#destino_pesquisa").val() == '') {
-        jQuery("#destino").val(''); 
+        jQuery(".destino input").val(''); 
       }
     remove_drop_destino();
     }).val('');
@@ -50,12 +50,44 @@ $('#sandbox-container').daterangepicker({
    jQuery(".dropdown").toggle(500);
 
   if (jQuery("#destino_pesquisa").val() == '') {
-        jQuery("#destino").val(''); 
+        jQuery(".destino input").val(''); 
       }
    remove_drop_destino();
    }
 
    jQuery(document).ready(function(){ 
+
+    jQuery(".wpforms-form").submit(function(e){
+        e.preventDefault();
+    });
+
+    jQuery(".destinos_motor input").attr("type", "hidden");
+    jQuery(".destinos_motor").attr("style", "padding:0");
+    jQuery(".propriedade input").attr("type", "hidden");
+    jQuery(".propriedade").attr("style", "padding:0");
+    jQuery("#destino_pesquisa").attr("type", "hidden");
+    jQuery(".destino_pesquisa").attr("style", "padding:0");
+    jQuery("#id_hotel").attr("type", "hidden");
+    jQuery(".id_hotel").attr("style", "padding:0");
+    jQuery("#id_destination_hotel").attr("type", "hidden");
+    jQuery(".id_destination_hotel").attr("style", "padding:0");
+    jQuery("#destino_hotel").attr("type", "hidden");
+    jQuery(".destino_hotel").attr("style", "padding:0");
+
+    jQuery(".destino input").attr("id", "destino");
+    jQuery(".destino").append('<div id="dados" style="display:none;width: 50%;background-color: #fff;z-index: 999;"><ul style="padding: 0px 10px; "> </ul> </div>');
+    jQuery(".destino").append('<div id="valida_campo_destino" style="display:none;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808; position: absolute;z-index: 99999;"> <p style="margin: 0 !important;font-size: 10px;color: #fff;">É necessário informar um destino para efetuar a pesquisa.</p> </div>');
+    jQuery(".destino input").attr("onkeypress", "exibe_destino()");
+    jQuery(".datas input").append('<div id="valida_campo_data" style="display:none;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808;position: absolute;z-index: 99999;"><p style="margin: 0 !important;font-size: 10px;color: #fff;">Necessário informar a data.</p></div>');
+
+    jQuery(".wpforms-submit").addClass("btn_pesquisa_aereo");
+    jQuery(".wpforms-submit").attr("onclick", "redirect_hotel()");
+
+    jQuery("form").attr("id", "");
+    jQuery("form").attr("action", "");
+    jQuery("form").attr("method", "");
+    jQuery("form").removeClass("wpforms-validate");
+    jQuery("form").attr("onsubmit", "redirect_hotel()");
     
 
     jQuery(".daterangepicker").addClass('show-calendar'); 
@@ -319,33 +351,35 @@ if (contador == 0) {
 
 function redirect_hotel(){
 
-      if (jQuery("#destino_pesquisa").val() == '') {
-        jQuery("#valida_campo_destino").attr('style', 'display:block;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808;top: 34px;position: absolute;z-index: 99999;');
-      }else if (jQuery("#validar_data").val() == '') {
-        jQuery("#valida_campo_data").attr('style', 'display:block;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808;top: 34px;position: absolute;z-index: 99999;');
+ if (jQuery("#destino_pesquisa").val() == '') {
+        jQuery("#valida_campo_destino").attr('style', 'display:block;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808;position: absolute;z-index: 99999;');
+      }else if (jQuery(".datas input").val() == '') {
+        jQuery("#valida_campo_data").attr('style', 'display:block;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808;position: absolute;z-index: 99999;');
       }else{
         jQuery("#valida_campo_destino").attr('style', 'display:none;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808;top: 34px;position: absolute;z-index: 99999;');
         jQuery("#valida_campo_data").attr('style', 'display:none;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808;top: 34px;position: absolute;z-index: 99999;');
+        
+ 
         jQuery(".btn_pesquisa_aereo").attr('style', 'width:100%;height: 45px;border-radius:0;background-color: #fff !important;');
-        jQuery(".btn_pesquisa_aereo").html('<img src="https://admin.montenegrodigital.com.br/img/loader.gif" style="height: 43px;margin-top: -6px;">');
+        jQuery(".btn_pesquisa_aereo").html('<img src="https://admin.montenegrodigital.com.br/img/loader.gif" style="height: 43px;margin-top: -10px;">');
 
-        var propriedade = jQuery("#propriedade").val();
+        var propriedade = jQuery(".propriedade input").val();
         var destino = jQuery("#destino_pesquisa").val();
         var id = jQuery("#id_hotel").val();
-        var data = jQuery("#validar_data").val();
+        var data = jQuery(".datas input").val();
         data = data.split(" - ");
         var data_inicio = data[0].replace("/", "-").replace("/", "-");
         var data_final = data[1].replace("/", "-").replace("/", "-");
-        var adt = jQuery(".count").val()
-        var chd = jQuery(".count_child").val()
-        var qts = jQuery(".count_quartos").val()
+        var adt = jQuery(".qtd_adt input").val()
+        var chd = jQuery(".qtd_chd input").val()
+        var qts = jQuery(".qtd_qts input").val()
 
-        var idade1 = jQuery("#idade_crianca1").val()
-        var idade2 = jQuery("#idade_crianca2").val()
-        var idade3 = jQuery("#idade_crianca3").val()
-        var idade4 = jQuery("#idade_crianca4").val()
-        var idade5 = jQuery("#idade_crianca5").val()
-        var idade6 = jQuery("#idade_crianca6").val()
+        var idade1 = '12';
+        var idade2 = '12';
+        var idade3 = '12';
+        var idade4 = '12';
+        var idade5 = '12';
+        var idade6 = '12';
 
 
       jQuery("#dados").attr("style", "display:none; position: absolute;width: 100%;top: 48px;background-color: #fff;"); 
@@ -375,7 +409,13 @@ function redirect_hotel(){
 
       var slug = response;
 
-        jQuery.post("/wp-content/plugins/integracao-hoteis/includes/ajax.php", data, function(response) { 
+      // if (jQuery("#id_destination_hotel").val().length > 8) {
+        var url_ajax_hoteis = "/wp-content/plugins/integracao-hoteis/includes/ajax_ehtl.php";
+      // }else{
+      //   var url_ajax_hoteis = "/wp-content/plugins/integracao-hoteis/includes/ajax.php";
+      // }
+ 
+        jQuery.post(url_ajax_hoteis, data, function(response) { 
 
             var data = {
               action: 'my_actiondados',
@@ -389,26 +429,28 @@ function redirect_hotel(){
               data: data, 
               dataType: 'json',
               success: function(result){ 
-                  window.location.href = '/produto-tag/'+result;
+                if (result === "0" || result === 0) {
+                  jQuery(".div_resultados").attr("style", "display:none;background-color: #eee;");
+                }else{
+                   window.location.href = '/produto-tag/'+result; 
+                }
               }
           });
  
         });
 
     });
- 
-
-}
+   }
 }
 
 function seleciona_cidade(destino){
-  jQuery("#destino").val(destino);
+  jQuery(".destino input").val(destino);
   jQuery("#destino_pesquisa").val(destino);
   jQuery("#destino_hotel").val('');
       jQuery("#dados").attr("style", "display:none; position: absolute;width: 100%;top: 48px;background-color: #fff;z-index: 999;");
 }
 function seleciona_hotel(nomehotel, destino, id, destination){
-  jQuery("#destino").val(nomehotel);
+  jQuery(".destino input").val(nomehotel);
   jQuery("#destino_pesquisa").val(nomehotel);
   jQuery("#destino_hotel").val(nomehotel);
   jQuery("#id_hotel").val(id);
@@ -417,7 +459,7 @@ function seleciona_hotel(nomehotel, destino, id, destination){
 }
 
 function limpar_campo(){
-  jQuery("#destino").val('');
+  jQuery(".destino input").val('');
   jQuery("#valida_campo_destino").attr('style', 'display:none;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808;top: 34px;position: absolute;z-index: 99999;');
       jQuery("#dados").attr("style", "display:none; position: absolute;width: 100%;top: 48px;background-color: #fff;z-index: 999;");
 
@@ -438,18 +480,19 @@ function strpos (haystack, needle, offset) {
   return i === -1 ? false : true;
 }
 function exibe_destino(){
+  jQuery("#valida_campo_destino").attr('style', 'display:none;margin: 0 !important;padding: 3px 10px;font-size: 10px;color: #fff;background-color: #ab0808;top: 34px;position: absolute;z-index: 99999;');
   jQuery("#destino_pesquisa").val('');
-  if (jQuery("#destino").val().trim().length >= 3){
+  if (jQuery(".destino input").val().trim().length >= 3){
 
     var destinos_motor = JSON.parse(jQuery("#destinos_motor").val()); 
 
     var dados = '';
-    console.log(replaceSpecialChars(jQuery("#destino").val().toUpperCase()));
+    console.log(replaceSpecialChars(jQuery(".destino input").val().toUpperCase()));
 
     jQuery(destinos_motor).each(function (i, item) {
             var codigo_pesquisar = replaceSpecialChars(item.name_local.toUpperCase());
 
-            var valor_pesquisado = replaceSpecialChars(jQuery("#destino").val().toUpperCase());
+            var valor_pesquisado = replaceSpecialChars(jQuery(".destino input").val().toUpperCase());
             console.log(strpos(replaceSpecialChars(item.name_hotel.toUpperCase()), valor_pesquisado));
 
             if (strpos(codigo_pesquisar, valor_pesquisado) === true) {
@@ -479,7 +522,7 @@ function exibe_destino(){
     });
 
     jQuery("#dados").html(dados);
-    jQuery("#dados").attr("style", "display:block; position: absolute;width: 100%;top: 48px;background-color: #fff;z-index: 999;");
+    jQuery("#dados").attr("style", "display:block; width: 50%; background-color: #fff;");
 
   }
 }
